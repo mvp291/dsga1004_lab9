@@ -4,6 +4,7 @@ var padding = 20,
 
 var data = [];
 var dataset = [];
+var datasetname = [];
 var xVar, yVar;
 var xValue, xScale, xMap, xAxis;
 var yValue, yScale, yMap, yAxis;
@@ -65,6 +66,14 @@ function subset(xVar, yVar) {
 	return dataset;
 }
 
+function subsetname(xVar, yVar) {
+        dataset = [];
+        data.forEach(function(row, i) {
+                dataset.push([row[xVar], row[yVar],row["name"]]);
+        });
+        return dataset;
+}
+
 function subset_min_max(xVar, yVar, min, max) {
 	console.log(min, max);
 	dataset = [];
@@ -81,6 +90,7 @@ function drawData(xVar, yVar) {
 	xVar = xVar;
 	yVar = yVar;
 	dataset = subset(xVar, yVar);
+        datasetname = subsetname(xVar, yVar);
 	xValue = function(d) { return d[0];};
 	xScale = d3.scale.linear().range([padding, width - padding*2]);
 	xMap = function (d) { return xScale(xValue(d))};
@@ -117,6 +127,7 @@ function drawData(xVar, yVar) {
     	.on('change', function() {
     		xVar = $('#sel-x option:selected').val();
     		dataset = subset(xVar, yVar);
+                datasetname = subsetname(xVar, yVar);
     		console.log(xVar, yVar, dataset[0], dataset[0]);
     		xValue = function(d) { return d[0];};
 			xScale = d3.scale.linear().range([padding, width - padding*2]);
@@ -124,12 +135,14 @@ function drawData(xVar, yVar) {
 			xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5);
 			xScale.domain([d3.min(dataset, xValue)-2, d3.max(dataset, xValue)+2]);
 			var svg = d3.select('svg');
-		  	var selection = svg.selectAll("circle").data(dataset, function(d) {return (d)});
+		  	var selection = svg.selectAll("circle").data(datasetaname, function(d) {return (d)});
 		  	selection.enter().append("circle")
 			    .attr("class", "dot")
 			    .attr("r", 3.5)
 			    .attr("cx", xMap)
 			    .attr("cy", yMap);
+                        selection.on("mouseover", function(d) {
+                            $("#hovered").text(d[2]); });
 			selection.exit().remove();
 			svg.select(".x.axis")
                 .transition()
@@ -140,6 +153,7 @@ function drawData(xVar, yVar) {
     	.on('change', function() {
     		yVar = $('#sel-y option:selected').val();
     		dataset = subset(xVar, yVar);
+                datasetname = subsetname(xVar, yVar);
     		console.log(xVar, yVar, dataset[0], dataset[0]);
     		yValue = function(d) { return d[1];};
 			yScale = d3.scale.linear().range([height - padding, padding]);
@@ -147,12 +161,14 @@ function drawData(xVar, yVar) {
 			yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5);
 			yScale.domain([d3.min(dataset, yValue)-2, d3.max(dataset, yValue)+2]);
 			var svg = d3.select('svg');
-			var selection = svg.selectAll("circle").data(dataset, function(d) {return (d)});
+			var selection = svg.selectAll("circle").data(datasetname, function(d) {return (d)});
 			selection.enter().append("circle")
 			    .attr("class", "dot")
 			    .attr("r", 3.5)
 			    .attr("cx", xMap)
 			    .attr("cy", yMap);
+                        selection.on("mouseover", function(d) {
+                            $("#hovered").text(d[2]); });
 			selection.exit().remove();
 			svg.select(".y.axis")
                 .transition()
@@ -174,4 +190,7 @@ function drawData(xVar, yVar) {
 			    .attr("cy", yMap);
 			selection.exit().remove();
     	})
+
+
+
 }
