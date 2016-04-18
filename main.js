@@ -1,4 +1,4 @@
-var padding = 20,
+var padding = 40,
     width = 500,
     height = 500;
 
